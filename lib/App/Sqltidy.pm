@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use v5.12;
 
+# ABSTRACT: Main Application Class for sqltidy
+
 package App::Sqltidy;
 
 use Parse::RecDescent;
