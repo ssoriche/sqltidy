@@ -1,7 +1,10 @@
 sqltidy
 =======
 
+Make your SQL statements pretty
+
 Primary goal convert:
+---------------------
 
 SELECT columnA, columnB,
 columnC, tablea.* FROM tablea
