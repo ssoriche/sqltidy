@@ -74,9 +74,24 @@ sub grammar {
   FROM : /from/i { push (@elements,"FROM") }
   SEMICOLON : ';'
   COMMA : ','
-  COLUMN : ...!FROM NAME COMMA(?) { push(@elements, $item[2] )}
+  COLUMN : ...!FROM NAME column_alias(?) COMMA(?) {
+    if($item[3][0]) {
+      push(@elements, $item[2] . ' ' . $item[3][0]);
+    }
+    else {
+      push(@elements, $item[2]);
+    }
+  }
   TABLE : FROM NAME { push(@elements, $item[2] )}
-  AS : /as/i
+  column_alias: AS(?) ...!FROM NAME {
+    if($item[1][0]) {
+      $return = $item[1][0] . ' ' . $item[3];
+    }
+    else {
+      $return = $item[2];
+    }
+  }
+  AS : /as/i { $return = 'AS' }
   NAME : /["']?(\w+)["']?/ { $return = $1 }
 
 END_OF_GRAMMAR
