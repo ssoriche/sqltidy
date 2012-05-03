@@ -24,3 +24,12 @@ Into:
         ON tablea.columnZ = b.foo
           AND b.bar = 'baz'
     ;
+
+After getting the formatting like above, then start adding options
+to make the formating customizable.
+
+Want to help out?
+-----------------
+
+Please fork it, and add tests into grammar.t. I go through a lot of SQL in a day
+but I don't see every combination.
