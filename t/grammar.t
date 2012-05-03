@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Test::Deep;
 
 use v5.12;
@@ -39,4 +39,10 @@ TODO: {
 
 $res = $parser->parse('SELECT a as c,b FROM DUAL;');
 cmp_deeply($res->{elements}, ['SELECT','a AS c','b','FROM','DUAL'], 'simple multi-column select w/alias & from');
+
+$res = $parser->parse('SELECT a,b FROM y as foo,bar;');
+cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y AS foo','bar'], 'multi-column select w/from implicit join');
+
+$res = $parser->parse('SELECT a,b FROM y,bar;');
+cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y','bar'], 'multi-column select w/from implicit join');
 

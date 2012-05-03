@@ -70,6 +70,8 @@ sub grammar {
 
   SELECT : /select/i { push(@elements,"SELECT") }
   INSERT : /insert into/i
+  INNER : /inner join/i
+  OUTER : /left outer join/i
 
   FROM : /from/i { push (@elements,"FROM") }
   SEMICOLON : ';'
@@ -82,7 +84,30 @@ sub grammar {
       push(@elements, $item[2]);
     }
   }
-  TABLE : FROM NAME { push(@elements, $item[2] )}
+
+  TABLE : FROM table_names(s) { push(@elements, @{$item[2]})}
+
+  table_names: NAME table_alias(?) COMMA(?) {
+    if ($item[2]) {
+      $return = $item[1] . join(' ',@{$item[2]});
+    }
+    else {
+      $return = $item[1];
+    }
+  }
+
+  table_alias: AS(?) ...!COMMA NAME {
+    if($item[1][0]) {
+      $return = ' '.$item[1][0] . ' ' . $item[3];
+    }
+    else {
+      $return = $item[2];
+    }
+  }
+
+  JOIN: INNER
+        | OUTER
+
   column_alias: AS(?) ...!FROM NAME {
     if($item[1][0]) {
       $return = $item[1][0] . ' ' . $item[3];
