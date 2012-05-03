@@ -107,6 +107,11 @@ sub parse {
     $::RD_TRACE = 1;
   }
 
+  # Enable warnings within the Parse::RecDescent module.
+  $::RD_ERRORS = 1; # Make sure the parser dies when it encounters an error
+  $::RD_WARN   = 1; # Enable warnings. This will warn on unused rules &c.
+  $::RD_HINT   = 1; # Give out hints to help fix problems.
+
   my $parser = Parse::RecDescent->new($self->grammar);
 
   return $parser->startrule($sql);
