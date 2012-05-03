@@ -12,11 +12,27 @@ use Data::Printer;
 
 sub new {
   my $this  = shift;
+  my $args  = shift;
   my $class = ref($this) || $this;
   my $self  = {};
   bless $self, $class;
 
+  foreach(keys(%$args)) {
+    $self->$_($args->{$_});
+  }
+
   return $self;
+}
+
+sub parser_trace {
+  my $self = shift;
+  my $value = shift;
+
+  if(defined($value)) {
+    $self->{parser_trace} = $value;
+  }
+
+  return $self->{parser_trace};
 }
 
 sub grammar {
@@ -75,7 +91,10 @@ sub parse {
   my $self = shift;
   my $sql = shift;
 
-  # $::RD_TRACE = 1;
+  if($self->parser_trace) {
+    $::RD_TRACE = 1;
+  }
+
   my $parser = Parse::RecDescent->new($self->grammar);
 
   return $parser->startrule($sql);
