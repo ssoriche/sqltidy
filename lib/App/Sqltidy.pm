@@ -41,7 +41,7 @@ sub grammar {
   my $grammar = <<'END_OF_GRAMMAR';
 
   {
-    my ( @tables, $table_order, @table_comments, @views, @triggers, @columns );
+    my ( @elements );
 
     sub _err {
       my $max_lines = 5;
@@ -56,10 +56,7 @@ sub grammar {
 
   startrule : statement(s) eofile {
     $return      = {
-        columns  => \@columns,
-        tables   => \@tables,
-        views    => \@views,
-        triggers => \@triggers,
+        elements  => \@elements,
     }
   }
 
@@ -71,14 +68,14 @@ sub grammar {
   command : SELECT
         | INSERT
 
-  SELECT : /select/i
+  SELECT : /select/i { push(@elements,"SELECT") }
   INSERT : /insert into/i
 
-  FROM : /from/i
+  FROM : /from/i { push (@elements,"FROM") }
   SEMICOLON : ';'
   COMMA : ','
-  COLUMN : ...!FROM NAME COMMA(?) { push(@columns, $item[2] )}
-  TABLE : NAME { push(@tables, $item[1] )}
+  COLUMN : ...!FROM NAME COMMA(?) { push(@elements, $item[2] )}
+  TABLE : NAME { push(@elements, $item[1] )}
   AS : /as/i
   NAME : /["']?(\w+)["']?/ { $return = $1 }
 
