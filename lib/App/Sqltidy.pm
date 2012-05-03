@@ -117,4 +117,14 @@ sub parse {
   return $parser->startrule($sql);
 }
 
+sub tidy {
+  my $self = shift;
+  my $sql = shift;
+
+  # XXX More work required on the grammar before this can be uncommented.
+  # my $elements = $self->parse($sql);
+
+  return "";
+}
+
 1;
