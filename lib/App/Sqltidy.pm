@@ -76,14 +76,35 @@ sub grammar {
   FROM : /from/i { push (@elements,"FROM") }
   SEMICOLON : ';'
   COMMA : ','
-  COLUMN : ...!FROM NAME column_alias(?) COMMA(?) {
-    if($item[3][0]) {
-      push(@elements, $item[2] . ' ' . $item[3][0]);
+
+  # COLUMN : NAME(s) ...!COMMA ...!FROM {push(@elements, join(' ',@{$item[1]}))}
+  #       | NAME(s) ...!FROM {push(@elements, join(' ',@{$item[1]}))}
+  #       | COMMA NAME(s) ...!FROM {push(@elements, join(' ',@{$item[2]}))}
+
+  # COLUMN : ...!FROM NAME(s) COMMA(?) {push(@elements, join(' ',@{$item[2]}))}
+          # | NAME(s) ...FROM {push(@elements, join(' ',@{$item[1]}))}
+          # | NAME(s) ...SEMICOLON {push(@elements, join(' ',@{$item[1]}))}
+
+  COLUMN : ...!FROM column_names(s) { push(@elements, @{$item[2]})}
+
+  column_names : ...!FROM NAME column_alias(?) COMMA(?) {
+    if($item[3]) {
+      $return = $item[2] . join(' ',@{$item[3]});
     }
     else {
-      push(@elements, $item[2]);
+      $return = $item[2];
     }
   }
+
+  column_alias: AS(?) ...!FROM ...!COMMA NAME {
+    if($item[1][0]) {
+      $return = ' '.$item[1][0] . ' ' . $item[4];
+    }
+    else {
+      $return = $item[2];
+    }
+  }
+
 
   TABLE : FROM table_names(s) { push(@elements, @{$item[2]})}
 
@@ -108,14 +129,6 @@ sub grammar {
   JOIN: INNER
         | OUTER
 
-  column_alias: AS(?) ...!FROM NAME {
-    if($item[1][0]) {
-      $return = $item[1][0] . ' ' . $item[3];
-    }
-    else {
-      $return = $item[2];
-    }
-  }
   AS : /as/i { $return = 'AS' }
   NAME : /["']?(\w+)["']?/ { $return = $1 }
 
