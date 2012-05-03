@@ -62,7 +62,7 @@ sub grammar {
 
   eofile : /^\Z/
 
-  statement : command COLUMN(s) FROM TABLE SEMICOLON(?)
+  statement : command COLUMN(s) TABLE(?) SEMICOLON(?)
       | /^\Z/ | { _err ($thisline, $text) }
 
   command : SELECT
@@ -75,7 +75,7 @@ sub grammar {
   SEMICOLON : ';'
   COMMA : ','
   COLUMN : ...!FROM NAME COMMA(?) { push(@elements, $item[2] )}
-  TABLE : NAME { push(@elements, $item[1] )}
+  TABLE : FROM NAME { push(@elements, $item[2] )}
   AS : /as/i
   NAME : /["']?(\w+)["']?/ { $return = $1 }
 
