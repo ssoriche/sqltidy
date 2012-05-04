@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Deep;
 
 use v5.12;
@@ -41,8 +41,13 @@ $res = $parser->parse('SELECT a as c,b FROM DUAL;');
 cmp_deeply($res->{elements}, ['SELECT','a AS c','b','FROM','DUAL'], 'simple multi-column select w/alias & from');
 
 $res = $parser->parse('SELECT a,b FROM y as foo,bar;');
-cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y AS foo','bar'], 'multi-column select w/from implicit join');
+cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y AS foo','bar'], 'multi-column select w/from implicit join & AS');
 
 $res = $parser->parse('SELECT a,b FROM y,bar;');
 cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y','bar'], 'multi-column select w/from implicit join');
 
+TODO: {
+  local $TODO = "table alias without an AS, same as the COLUMN test";
+  $res = $parser->parse('SELECT a,b FROM y bar;');
+  cmp_deeply($res->{elements}, ['SELECT','a','b','FROM','y bar'], 'multi-column select w/from single table alias');
+}
